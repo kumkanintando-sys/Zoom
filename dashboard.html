@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Zoom staff dashboard</title>
+<style>
+:root{--bg:#eceae4;--card:#fff;--ink:#22262a;--mute:#5d646b;--line:#d5d2c9;--road:#2b3036;--sig:#f2b705;--ok:#1d6f55;--bad:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171a1d;--card:#22272b;--ink:#eceae4;--mute:#a3abb2;--line:#363c42;--road:#0f1113;--ok:#47c29a;--bad:#ff8a80}}
+:root[data-theme="dark"]{--bg:#171a1d;--card:#22272b;--ink:#eceae4;--mute:#a3abb2;--line:#363c42;--road:#0f1113;--ok:#47c29a;--bad:#ff8a80}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",Verdana,system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sig);outline-offset:2px}
+header{background:var(--road);color:#fff;position:sticky;top:0;z-index:5}
+.bar{max-width:1060px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-weight:700;font-size:20px;margin-right:auto;letter-spacing:.2px}
+.logo i{display:inline-block;width:22px;height:6px;background:var(--sig);border-radius:3px;margin-right:8px;vertical-align:middle}
+.btn{border:2px solid transparent;border-radius:8px;padding:9px 16px;font-weight:700;background:var(--sig);color:#22262a}
+.btn.alt{background:transparent;border-color:rgba(255,255,255,.55);color:#fff}
+.btn.line{background:transparent;border-color:var(--ink);color:var(--ink)}
+.btn.ok{background:var(--ok);color:#fff}
+main{max-width:1060px;margin:0 auto;padding:20px 16px 60px}
+.hero{padding:28px 0 18px}
+.hero h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 10px;max-width:16em}
+.hero p{margin:0 0 18px;color:var(--mute);max-width:36em}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.cta .btn{padding:13px 22px;font-size:17px}
+.safe{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:22px 0}
+.safe div{border-left:5px solid var(--ok);background:var(--card);padding:10px 14px;border-radius:0 8px 8px 0;font-size:14px}
+.safe b{display:block}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+.tools input,.tools select{padding:9px 12px;border:2px solid var(--line);border-radius:8px;background:var(--card)}
+.tools input{flex:1;min-width:160px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.car{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.car .pic{background:linear-gradient(#dfe3e6,#c9cdd0);padding:10px 14px 0}
+.car .pic svg{display:block;width:100%;height:auto}
+.car .in{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.car h3{margin:0;font-size:18px}
+.price{font-size:22px;font-weight:700}
+.meta{color:var(--mute);font-size:14px}
+.tag{display:inline-block;background:rgba(29,111,85,.15);color:var(--ok);border-radius:6px;padding:2px 8px;font-size:13px;font-weight:700}
+.row{display:flex;gap:8px;margin-top:auto;padding-top:10px}
+.row .btn{flex:1;padding:9px 8px}
+/* dialogs */
+.ov{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(10,12,14,.65);z-index:20;display:none;align-items:center;justify-content:center;padding:14px;overflow:auto}
+.ov.on{display:flex}
+.box{background:var(--card);border-radius:14px;max-width:560px;width:100%;padding:22px;max-height:92vh;overflow:auto}
+.box.wide{max-width:760px}
+.box h2{margin:0 0 6px;font-size:22px}
+.box p{margin:6px 0 12px;color:var(--mute)}
+.x{float:right;background:none;border:0;font-size:26px;line-height:1;padding:0 4px}
+label{display:block;font-weight:700;font-size:14px;margin:10px 0 4px}
+.f{width:100%;padding:11px 12px;border:2px solid var(--line);border-radius:8px;background:var(--bg)}
+.tabs{display:flex;gap:6px;margin:10px 0}
+.tabs button{flex:1;padding:9px;border:2px solid var(--line);background:transparent;border-radius:8px;font-weight:700}
+.tabs button[aria-pressed="true"]{background:var(--road);color:#fff;border-color:var(--road)}
+.err{color:var(--bad);font-weight:700;min-height:1.3em;font-size:14px;margin:8px 0 0}
+.note{font-size:13px;color:var(--mute)}
+.ck{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--road);color:#fff;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));display:none;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
+.ck.on{display:block}
+.ck .w{max-width:1060px;margin:0 auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.ck p{margin:0;flex:1;min-width:240px;font-size:14px}
+.ck label{display:inline-flex;align-items:center;gap:6px;margin:6px 12px 0 0;font-weight:400}
+/* 360 */
+.v360{background:linear-gradient(#e3e6e8 0,#cfd3d6 70%,#9aa0a5 70%);border-radius:10px;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;position:relative}
+.v360 svg{display:block;width:100%;height:auto}
+.v360 .hint{position:absolute;left:10px;top:8px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:3px 9px;border-radius:12px}
+input[type=range]{width:100%;accent-color:var(--sig)}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px}
+td{padding:7px 4px;border-bottom:1px solid var(--line)}td:first-child{color:var(--mute);width:42%}
+.chk{list-style:none;padding:0;margin:8px 0}
+.chk li:before{content:"\2713";color:var(--ok);font-weight:700;margin-right:8px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ok);color:#fff;padding:10px 18px;border-radius:24px;z-index:40;display:none;font-weight:700}
+@media (prefers-reduced-motion:no-preference){.ov.on .box{animation:pop .18s ease-out}@keyframes pop{from{transform:translateY(10px);opacity:.4}to{transform:none;opacity:1}}}
+.ph{display:block;width:calc(100% + 28px);margin:-10px -14px 0;max-width:none}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font-size:28px;line-height:1.1}.stat span{color:var(--mute);font-size:14px}
+.dt{display:block;overflow-x:auto;background:var(--card);border-radius:10px}
+.dt td,.dt th{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.dt td:first-child{width:auto;color:inherit}
+.dt .btn{padding:5px 10px;font-size:14px;margin-right:4px}
+.pill{border-radius:12px;padding:2px 10px;font-size:13px;font-weight:700;background:var(--line)}
+.pill.live,.pill.accepted{background:var(--ok);color:#fff}.pill.pending{background:var(--sig);color:#22262a}
+.pill.rejected,.pill.removed,.pill.declined{background:var(--bad);color:#fff}
+.fx{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+button.stat{text-align:left;cursor:pointer;font:inherit;color:inherit;width:100%}
+.thumb{width:64px;height:44px;object-fit:cover;border-radius:6px;display:block}
+.phg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
+.phg img{width:100%;border-radius:8px;display:block}
+.sec{margin:22px 0 6px;font-size:18px}
+</style>
+</head>
+<body>
+<header><div class="bar">
+<div class="logo"><i></i>Zoom staff</div>
+<a class="btn alt" href="/" style="text-decoration:none">View site</a>
+<button class="btn alt" id="bOut" style="display:none">Sign out</button>
+</div></header>
+
+<main id="auth">
+<div class="box" style="margin:30px auto">
+<h2>Staff sign in</h2>
+<p>Sign in with your Zoom staff email and password.</p>
+<label for="em">Email address</label><input class="f" id="em" type="email" autocomplete="username">
+<label for="pw">Password</label><input class="f" id="pw" type="password" autocomplete="current-password">
+<div class="err" id="e1"></div>
+<button class="btn ok" id="go1" style="width:100%;padding:12px">Sign in</button>
+</div>
+</main>
+
+<main id="deny" style="display:none">
+<div class="box" style="margin:30px auto">
+<h2>Staff only</h2>
+<p>This account is not a Zoom staff account, so there is nothing to manage here. Ask an existing admin to give you access.</p>
+</div>
+</main>
+
+<main id="dash" style="display:none">
+<div class="tabs" id="dtabs" style="flex-wrap:wrap"></div>
+<div id="dtab" aria-live="polite"></div>
+</main>
+
+<div class="ov" id="ovPh" role="dialog" aria-modal="true" aria-labelledby="phT"><div class="box wide">
+<button class="x" data-close aria-label="Close">&times;</button>
+<h2 id="phT">Photos</h2><div class="phg" id="phg"></div>
+</div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+/* Paste the same Supabase values you used in zoom.html (Project settings, API). */
+var SB_URL="https://inqlktyyurzewtamrzjb.supabase.co",SB_KEY="sb_publishable_Ocu-RH5u5PjNGmCgMfsocQ_E9NUQeoI";
+var sb=null;try{if(/^https:/.test(SB_URL)&&window.supabase)sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){}
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function R(n){return "R "+String(Math.round(+n)).replace(/\B(?=(\d{3})+(?!\d))/g," ")}
+function toast(t){var e=$("toast");e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none"},3000)}
+var me={user:null,profile:null};
+
+/* ---------- staff sign in (email and password) ---------- */
+async function signIn(){
+ var em=$("em").value.trim(),pw=$("pw").value,e=$("e1");
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){e.textContent="Enter a valid email address, like name@example.com.";return}
+ if(!pw){e.textContent="Enter your password.";return}
+ if(!sb){e.textContent="Not connected to Supabase yet. Check the project URL and key at the top of the script.";return}
+ e.textContent="";$("go1").disabled=true;
+ var r=await sb.auth.signInWithPassword({email:em,password:pw});
+ $("go1").disabled=false;
+ if(r.error){e.textContent="The email or password is wrong. Try again.";return}
+ $("pw").value=""}
+$("go1").onclick=signIn;
+$("pw").addEventListener("keydown",function(ev){if(ev.keyCode===13)signIn()});
+$("bOut").onclick=function(){sb.auth.signOut()};
+async function setUser(u){
+ me.user=u;me.profile=null;
+ if(u){var r=await sb.from("profiles").select("*").eq("id",u.id).maybeSingle();me.profile=r.data}
+ var staff=!!(u&&me.profile&&me.profile.role==="admin"&&!me.profile.suspended);
+ $("auth").style.display=u?"none":"block";$("deny").style.display=u&&!staff?"block":"none";$("dash").style.display=staff?"block":"none";$("bOut").style.display=u?"":"none";
+ if(staff)render();
+}
+if(sb)sb.auth.onAuthStateChange(function(ev,s){setTimeout(function(){setUser(s?s.user:null)},0)});
+
+/* ---------- dashboard ---------- */
+var TABS=[["over","Overview"],["queue","Review queue"],["cars","All cars"],["reps","Reports"],["offers","Offers"],["users","Users"],["log","Activity log"]];
+var tab="over",cf={s:"all",q:""},uq="";
+function nm(c){return esc(c.year+" "+c.make+" "+c.model)}
+function pill(s){return '<span class="pill '+esc(s)+'">'+esc(s)+"</span>"}
+function b(a,id,t){return '<button class="btn line" data-a="'+a+'" data-id="'+esc(id)+'">'+t+"</button>"}
+function dt(h,rows){if(!rows.length)return '<p class="note">Nothing here.</p>';return '<table class="dt"><tr><th>'+h.join("</th><th>")+"</th></tr>"+rows.map(function(r){return "<tr><td>"+r.join("</td><td>")+"</td></tr>"}).join("")+"</table>"}
+function who(p){p=p||{};return esc((p.full_name||"Unnamed")+" · "+(p.email||p.phone||"no contact"))}
+function fail(){return '<p class="err">Could not load this. Check that both Supabase migrations have run.</p>'}
+function card(n,l,t){return '<button class="stat" data-t="'+t+'"><b>'+n+"</b><span>"+l+"</span></button>"}
+function pc(a,t){return t?Math.round(a*100/t)+"%":"0%"}
+
+async function render(){
+ $("dtabs").innerHTML=TABS.map(function(t){return '<button data-t="'+t[0]+'" aria-pressed="'+(t[0]===tab)+'" style="flex:none;padding:9px 14px">'+t[1]+"</button>"}).join("");
+ $("dtab").innerHTML='<p class="note">Loading...</p>';
+ var h="",r;
+ if(tab==="over"){r=await sb.rpc("admin_stats");if(r.error)h=fail();else{var s=r.data;
+  h='<h2 class="sec">Needs attention</h2><div class="stats">'+card(s.pending,"Cars awaiting review","queue")+card(s.open_reports,"Open reports","reps")+card(s.offers_pending,"Offers waiting for sellers","offers")+"</div>"+
+  '<h2 class="sec">Cars</h2><div class="stats">'+card(s.live,"Live","cars")+card(s.sold,"Sold","cars")+card(s.removed,"Removed or rejected","cars")+card(s.new_listings_7d,"Listed in the last 7 days","cars")+"</div>"+
+  '<h2 class="sec">People</h2><div class="stats">'+card(s.users,"Accounts","users")+card(s.verified_users,"Verified","users")+card(s.new_users_7d,"Joined in the last 7 days","users")+card(s.suspended_users,"Suspended","users")+"</div>"+
+  '<h2 class="sec">Cookie choices</h2><div class="stats">'+card(s.cookie_total,"Choices recorded","over")+card(pc(s.cookie_analytics,s.cookie_total),"Accepted analytics","over")+card(pc(s.cookie_personalisation,s.cookie_total),"Accepted personalisation","over")+"</div>"}}
+ if(tab==="queue"||tab==="cars"){
+  var q=sb.from("listings").select("id,make,model,year,price,status,city,created_at,profiles(full_name,email,phone,verified),listing_vins(vin),listing_photos(path,angle_index)").order("created_at",{ascending:tab==="queue"}).limit(100);
+  if(tab==="queue")q=q.eq("status","pending");else{if(cf.s!=="all")q=q.eq("status",cf.s);if(cf.q)q=q.or("make.ilike.%"+cf.q+"%,model.ilike.%"+cf.q+"%")}
+  r=await q;
+  var ctl=tab==="cars"?'<div class="tools"><select id="fs" aria-label="Status">'+["all","pending","live","sold","rejected","removed"].map(function(x){return '<option value="'+x+'"'+(x===cf.s?" selected":"")+">"+(x==="all"?"All statuses":x)+"</option>"}).join("")+'</select><input id="fq" type="search" placeholder="Search make or model" value="'+esc(cf.q)+'" aria-label="Search cars"></div>':"";
+  h=ctl+(r.error?fail():dt(["Photo","Car","Price","City","VIN","Seller","Status","Added",""],(r.data||[]).map(function(c){
+   var ph=(c.listing_photos||[]).slice().sort(function(a,b){return a.angle_index-b.angle_index}),v=c.listing_vins;v=Array.isArray(v)?v[0]:v;
+   var th=ph.length?'<img class="thumb" alt="" src="'+esc(sb.storage.from("car-photos").getPublicUrl(ph[0].path).data.publicUrl)+'">':"None";
+   var a=b("ph",c.id,"Photos ("+ph.length+")");
+   if(c.status==="pending")a+=b("app",c.id,"Approve")+b("rej",c.id,"Reject");
+   if(c.status==="live")a+=b("rm",c.id,"Remove");
+   if(c.status==="removed"||c.status==="rejected")a+=b("reopen",c.id,"Send back to review");
+   return [th,nm(c),R(c.price),esc(c.city||"-"),esc(v?v.vin:"-"),who(c.profiles),pill(c.status),c.created_at.slice(0,10),a]})))}
+ if(tab==="reps"){r=await sb.from("reports").select("id,reason,created_at,resolved,listings(make,model,year,status),profiles(full_name,email,phone)").eq("resolved",false).order("created_at");
+  h=r.error?fail():dt(["Car","Reason","Reported by","Date",""],(r.data||[]).map(function(x){return [x.listings?nm(x.listings)+" "+pill(x.listings.status):"-",esc(x.reason),who(x.profiles),x.created_at.slice(0,10),b("res",x.id,"Dismiss")+b("rmcar",x.id,"Remove car")]}))}
+ if(tab==="offers"){r=await sb.from("offers").select("id,amount,message,status,created_at,listings(make,model,year,price),profiles(full_name,email,phone)").order("created_at",{ascending:false}).limit(100);
+  h=r.error?fail():dt(["Car","Asking","Offer","Buyer","Message","Status","Date"],(r.data||[]).map(function(o){return [o.listings?nm(o.listings):"-",o.listings?R(o.listings.price):"-",R(o.amount),who(o.profiles),esc(o.message||""),pill(o.status),o.created_at.slice(0,10)]}))}
+ if(tab==="users"){var u=sb.from("profiles").select("id,full_name,email,phone,role,verified,suspended,created_at,listings(count)").order("created_at",{ascending:false}).limit(100);
+  if(uq)u=u.or("full_name.ilike.%"+uq+"%,email.ilike.%"+uq+"%,phone.ilike.%"+uq+"%");r=await u;
+  h='<div class="tools"><input id="uq" type="search" placeholder="Search name, email or phone" value="'+esc(uq)+'" aria-label="Search users"></div>'+(r.error?fail():dt(["Name","Contact","Role","Verified","Cars listed","Joined",""],(r.data||[]).map(function(p){var me2=p.id===me.user.id,n=p.listings&&p.listings[0]?p.listings[0].count:0;
+   return [esc(p.full_name||"Unnamed"),esc(p.email||p.phone||"-"),pill(p.role==="admin"?"live":"pending").replace(/>.*?</,">"+esc(p.role)+"<"),p.verified?"Yes":"No",n,p.created_at.slice(0,10),
+    me2?"You":(p.suspended?pill("removed").replace(/>.*?</,">suspended<")+b("unsus",p.id,"Restore"):b("sus",p.id,"Suspend"))+(p.role==="admin"?b("unadm",p.id,"Remove admin"):b("adm",p.id,"Make admin"))]})))}
+ if(tab==="log"){r=await sb.from("audit_log").select("action,target_type,target_id,detail,created_at,profiles(full_name,email)").order("created_at",{ascending:false}).limit(100);
+  h=r.error?fail():dt(["When","Staff member","Action","Target"],(r.data||[]).map(function(l){return [l.created_at.replace("T"," ").slice(0,16),who(l.profiles),esc(l.action.replace(/_/g," ")),esc(l.target_type+" "+String(l.target_id||"").slice(0,8))]}))}
+ $("dtab").innerHTML=h}
+
+async function act(a,id){
+ var rpc=null,args=null,ask=null;
+ if(a==="app"){rpc="admin_set_listing_status";args={p_id:id,p_status:"live"}}
+ if(a==="rej"){rpc="admin_set_listing_status";args={p_id:id,p_status:"rejected"};ask="Reject this car? The seller will see it as rejected."}
+ if(a==="rm"){rpc="admin_set_listing_status";args={p_id:id,p_status:"removed"};ask="Remove this car from the site?"}
+ if(a==="reopen"){rpc="admin_set_listing_status";args={p_id:id,p_status:"pending"}}
+ if(a==="res"){rpc="admin_resolve_report";args={p_id:id,p_remove:false}}
+ if(a==="rmcar"){rpc="admin_resolve_report";args={p_id:id,p_remove:true};ask="Remove the reported car and close this report?"}
+ if(a==="sus"){rpc="admin_set_suspended";args={p_user:id,p_suspended:true};ask="Suspend this account? Their cars come down and pending offers are withdrawn."}
+ if(a==="unsus"){rpc="admin_set_suspended";args={p_user:id,p_suspended:false}}
+ if(a==="adm"){rpc="admin_set_role";args={p_user:id,p_role:"admin"};ask="Give this person full staff access?"}
+ if(a==="unadm"){rpc="admin_set_role";args={p_user:id,p_role:"user"};ask="Remove this person’s staff access?"}
+ if(!rpc||(ask&&!window.confirm(ask)))return;
+ var r=await sb.rpc(rpc,args);toast(r.error?"Did not save: "+r.error.message:"Saved");render()}
+async function photos(id){
+ var r=await sb.from("listing_photos").select("path,angle_index").eq("listing_id",id).order("angle_index");
+ var h=(r.data||[]).map(function(p,i){return '<img alt="Photo '+(i+1)+'" src="'+esc(sb.storage.from("car-photos").getPublicUrl(p.path).data.publicUrl)+'">'}).join("");
+ $("phg").innerHTML=h||'<p class="note">This listing has no photos.</p>';$("ovPh").className="ov on"}
+document.addEventListener("click",function(e){var t=e.target;if(!t.getAttribute)return;
+ if(t.hasAttribute("data-close")||(t.id==="ovPh"))$("ovPh").className="ov";
+ var a=t.getAttribute("data-a"),id=t.getAttribute("data-id"),g=t.closest?t.closest("[data-t]"):null;
+ if(a==="ph")photos(id);else if(a)act(a,id);else if(g){tab=g.getAttribute("data-t");render()}});
+document.addEventListener("keydown",function(e){if(e.keyCode===27)$("ovPh").className="ov"});
+$("dtab").addEventListener("change",function(e){if(e.target.id==="fs"){cf.s=e.target.value;render()}if(e.target.id==="fq"){cf.q=e.target.value.trim().replace(/[,()%]/g," ");render()}if(e.target.id==="uq"){uq=e.target.value.trim().replace(/[,()%]/g," ");render()}});
+})();
+</script>
+</body>
+</html>
